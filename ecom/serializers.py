@@ -14,7 +14,8 @@ class ShippingAddressSerializer(ModelSerializer):
 
 class UserSerializer(ModelSerializer):
 
-    shipping_addresses = ShippingAddressSerializer(many=True)
+    shipping_addresses = ShippingAddressSerializer(many=True, read_only=True)
+    default_shipping_address = ShippingAddressSerializer(read_only=True)
 
     class Meta:
         model = User

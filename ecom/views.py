@@ -10,9 +10,21 @@ from .serializers import UserSerializer, ShippingAddressSerializer
 from .serializers import CreateShippingAddressSerializer
 
 
-class UserListCreateAPIView(ListCreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class UserListCreateAPIView(APIView):
+
+    def get(self, request):
+
+        users = User.objects.all().prefetch_related('shipping_addresses').select_related('default_shipping_address')
+        return Response(
+            UserSerializer(users, many=True).data
+        )
+    def post(self, request):
+        serialized = UserSerializer(data=request.data)
+        if not serialized.is_valid():
+            return Response(serialized.errors, status=400)
+
+        serialized.save()
+        return Response(serialized.data, status=201)
 
 class UserRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
